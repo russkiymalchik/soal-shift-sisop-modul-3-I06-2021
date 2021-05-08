@@ -49,30 +49,6 @@ void main() {
         }
     }
 
-    printf("Your Matrix 4x3 is:\n");
-
-    for ( i = 0; i < 4; ++i) 
-    {
-        for ( j = 0; j < 3; ++j) 
-        {
-            printf("%d\t", matrix1[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-    printf("Your Matrix 3x6 is:\n");
-
-    for ( i = 0; i < 3; ++i) 
-    {
-        for ( j = 0; j < 6; ++j) 
-        {
-            printf("%d\t", matrix2[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-
     printf("Multiplication Matrix:\n");
     
     for ( i = 0; i < 4; ++i) 
