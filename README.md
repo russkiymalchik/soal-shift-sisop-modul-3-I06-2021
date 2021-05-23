@@ -92,6 +92,8 @@ printf("Multiplication Matrix:\n");
 ```
 Below is the result of 2a
 
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2a.png)
+
 ### 2b
 Create a program using the output matrix of the previous program (program soal2a.c) (Note!: Use shared memory). Then the matrix will be calculated with the new matrix. As follows an example of calculation for the existing matrix. The calculation is that each cell originating from matrix A becomes a number for factorial, then cells from matrix B become the maximum factorial limit (from largest to smallest) (Note!: Use threads for calculations in each cell).
 
@@ -230,6 +232,8 @@ Create and join the thread. At last, print the result of problem 2b.
 ```
 Below is the result of 2b
 
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2b.png)
+
 ### 2c
 For fear of lags in the process of helping Loba, Crypto also created a program (soal2c.c) to check the top 5 processes consuming computer resources with the command  “ps aux | sort -nrk 3,3 | head -5” (Note !: You must use IPC Pipes).
 
@@ -318,6 +322,8 @@ Next, in the child process, use the pipe to connect the 3 command (ps aux | sort
 ```
 
 Below is the result of 2c
+
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2c.png)
 
 ## Problem 3
 During his time of inactivity, a student named Alex. He had an idea to tidy up a number of files on his laptop. Because there are too many files, Alex asked Ayub for advice.
