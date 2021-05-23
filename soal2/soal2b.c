@@ -12,9 +12,9 @@ int matB[4][6];
 unsigned long long result[4][6];
 int (*value)[6];
 
-int func1(int a)
+int func1 (int a)
 {
-    if(a >= 1)
+    if (a >= 1)
     {
         return a*func1(a-1);
     }
@@ -24,33 +24,33 @@ int func1(int a)
     }
 }
 
-int func2(int b, int a)
+int func2 (int b, int a)
 {
     int tot = 1;
-    for(int i = b ; i > a ; i--)
+    for (int i = b ; i > a ; i--)
     {
         tot = tot * i;
     }
     return tot;
 }
 
-void *operand(void *arg) 
+void *operand (void *arg) 
 {
-    for(int i=0; i<4; i++)
+    for (int i=0; i<4; i++)
     {
-        for(int j=0; j<6; j++) 
+        for (int j=0; j<6; j++) 
         {
             pthread_t id = pthread_self();
             int iter = 0;
-            if(pthread_equal(id, tid[iter])) 
+            if (pthread_equal(id, tid[iter])) 
             {
-                if(matA[i][j] == 0 || matB[i][j] == 0)
+                if (matA[i][j] == 0 || matB[i][j] == 0)
                 { result[i][j] = 0; }
 
-                if(matB[i][j] > matA[i][j])
+                if (matB[i][j] > matA[i][j])
                 { result[i][j] = func1(matA[i][j]); }
 
-                if(matA[i][j] >= matB[i][j])
+                if (matA[i][j] >= matB[i][j])
                 { result[i][j] = func2(matA[i][j], (matA[i][j] - matB[i][j])); }
 
                 iter++;
@@ -114,9 +114,9 @@ void main() {
     }
     
     printf("\nThe Result from Factorial Matrix are:\n");
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 6; j++) 
+        for (int j = 0; j < 6; j++) 
         {
             printf("%llu\t", result[i][j]);
         }
