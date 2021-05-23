@@ -325,6 +325,10 @@ Below is the result of 2c
 
 ![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2c.png)
 
+### Error When Solving Problem 2
+1. In problem 2b, the constraint of the result can't use "int" in some testcase. Thus, we use "unsigned long long".
+2. In problem 2c, there is a minor error in the pipe before, but now we already fix it.
+
 ## Problem 3
 During his time of inactivity, a student named Alex. He had an idea to tidy up a number of files on his laptop. Because there are too many files, Alex asked Ayub for advice.
 Ayub suggests creating a C program to categorize the files. This program will move files according to their extension into a folder according to the extension. The folder is in the working directory in which the categorization program is run.
