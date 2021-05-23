@@ -95,10 +95,145 @@ Below is the result of 2a
 ### 2b
 Create a program using the output matrix of the previous program (program soal2a.c) (Note!: Use shared memory). Then the matrix will be calculated with the new matrix. As follows an example of calculation for the existing matrix. The calculation is that each cell originating from matrix A becomes a number for factorial, then cells from matrix B become the maximum factorial limit (from largest to smallest) (Note!: Use threads for calculations in each cell).
 
+### Problem Solving
+
+First, we make two function:
+- func1 is used when receive only one parameter
+- func2 is used when receive two parameters
+```
+pthread_t tid[24];
+int matA[4][6];
+int matB[4][6];
+
+unsigned long long result[4][6];
+int (*value)[6];
+
+int func1(int a)
+{
+    if(a >= 1)
+    {
+        return a*func1(a-1);
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+int func2(int b, int a)
+{
+    int tot = 1;
+    for(int i = b ; i > a ; i--)
+    {
+        tot = tot * i;
+    }
+    return tot;
+}
+```
+Second, we make another function to calculate the factorial operation. In this source code it's named as void *operand.
+
+According to the problem, it has 3 condition:
+1. If 0 -> 0
+```
+if(matA[i][j] == 0 || matB[i][j] == 0)
+	{ result[i][j] = 0; }
+```
+
+2. If b > a -> a!
+
+It will called func1
+```
+if(matB[i][j] > matA[i][j])
+	{ result[i][j] = func1(matA[i][j]); }
+```
+
+3. If a >= b  -> a!/(a-b)!
+
+It will called func2
+```
+if(matA[i][j] >= matB[i][j])
+	{ result[i][j] = func2(matA[i][j], (matA[i][j] - matB[i][j])); }
+```
+Next, called the result from problem 2a when they (program 2a) sleep.
+```
+void main() {
+    key_t key = 1234;
+    
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
+    value = shmat(shmid, NULL, 0);
+
+    printf("Matrix 2A:\n");
+    for (int i = 0; i < 4; ++i) 
+    {
+        for (int j = 0; j < 6; ++j) 
+        {
+            matA[i][j] = value[i][j];
+            printf("%d\t", matA[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+```
+After that, declare the new matrix that will be the length of factorial matrix from problem 2a and print it.
+```
+int b[4][6] = 
+    { 
+        {14, 2, 3, 8, 8, 10},
+        {7, 4, 8, 5, 14, 9},
+        {9, 2, 13, 5, 11, 2},
+        {8, 7, 10, 4, 10, 8}
+    };
+
+    printf("Matrix 2B:\n");
+    for (int i = 0; i < 4; ++i) 
+    {
+        for (int j = 0; j < 6; ++j) 
+        {
+            matB[i][j] = b[i][j];
+            printf("%d\t", matB[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+```
+Create and join the thread. At last, print the result of problem 2b.
+```
+    for (int i = 0; i < 4; ++i) 
+    {
+        for (int j = 0; j < 6; ++j) 
+        {
+            pthread_create(&tid[6*i + j], NULL, &operand, NULL);
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) 
+    {
+        for (int j = 0; j < 6; ++j) 
+        {
+            pthread_join(tid[6*i + j], NULL);
+        }
+    }
+    
+    printf("\nThe Result from Factorial Matrix are:\n");
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 6; j++) 
+        {
+            printf("%llu\t", result[i][j]);
+        }
+        printf("\n");
+    }
+
+    shmdt(value);
+    shmctl(shmid, IPC_RMID, NULL);
+}
+```
 Below is the result of 2b
 
 ### 2c
 For fear of lags in the process of helping Loba, Crypto also created a program (soal2c.c) to check the top 5 processes consuming computer resources with the command  “ps aux | sort -nrk 3,3 | head -5” (Note !: You must use IPC Pipes).
+
+### Problem Solving
 
 Below is the result of 2c
 
