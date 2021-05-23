@@ -40,50 +40,50 @@ int main()
 	// Parent process 
 
 	if (p == 0) 
-    {
+    	{
 		close(fd1[0]); // Close reading end of first pipe 
 		
-        dup2(fd1[1], STDOUT_FILENO);
-        char *argv[] = {"ps", "aux", NULL};
+        	dup2(fd1[1], STDOUT_FILENO);
+        	char *argv[] = {"ps", "aux", NULL};
 		execv("/bin/ps", argv);
-        exit(EXIT_SUCCESS);
+        	exit(EXIT_SUCCESS);
 	} 
 
-    // Child process
-    else 
-    {
+    	// Child process
+    	else 
+    	{
 		wait(NULL);
 		p = fork();
 		if (p < 0) 
-        {
+        	{
 			exit(EXIT_FAILURE);
-	    }
+		}
 
-	    if (p == 0)
-        {
-		    close(fd1[1]); // Close writing end of first pipe 
-            dup2(fd1[0], STDIN_FILENO);
+		if (p == 0)
+		{
+			close(fd1[1]); // Close writing end of first pipe 
+            		dup2(fd1[0], STDIN_FILENO);
 		    
-            close(fd2[0]); // Close reading end of second pipe 
-		    dup2(fd2[1], STDOUT_FILENO);
+            		close(fd2[0]); // Close reading end of second pipe 
+			dup2(fd2[1], STDOUT_FILENO);
 		    
-            char *argv[] = {"sort", "-nrk 3,3", NULL};
-		    execv("/usr/bin/sort", argv);
-            exit(EXIT_SUCCESS);
-	    }
+            		char *argv[] = {"sort", "-nrk 3,3", NULL};
+			execv("/usr/bin/sort", argv);
+            		exit(EXIT_SUCCESS);
+		}
 
-        else
-        {
-		    close(fd2[1]); // Close writing end of second pipe 
-            close(fd1[1]); // Close writing end of first pipe
-            close(fd1[0]); // Close reading end of first pipe
+		else
+        	{
+			close(fd2[1]); // Close writing end of second pipe 
+            		close(fd1[1]); // Close writing end of first pipe
+            		close(fd1[0]); // Close reading end of first pipe
 		    
-            wait(NULL);
+            		wait(NULL);
 		    
-            dup2(fd2[0], STDIN_FILENO);
-		    char *argv[] = {"head", "-5", NULL};
-		    execv("/usr/bin/head", argv);
-            exit(EXIT_SUCCESS);
-	    }
+            		dup2(fd2[0], STDIN_FILENO);
+			char *argv[] = {"head", "-5", NULL};
+			execv("/usr/bin/head", argv);
+            		exit(EXIT_SUCCESS);
+		}
 	}
 }
