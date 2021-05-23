@@ -4,6 +4,361 @@
 2. Juan Carlos Tepanus Pardosi          (05111942000017)
 3. Khairi Wiryawan    				          (05111942000023)
 ## Problem 1
+Keverk is a famous ambitious person in his colleagues. Before he became the head of department in HTMC, he has done a project which tells him to make a book server database. This project is required, so that it could be used by the app owner and is expected from the users. 
+
+In this project, Keverk is asked to: 
+### 1a
+When a client is connected to the server, there are two main options. They are register and login. If the user has chosen the register option, the client will prompt an id and password to be sent to the server. Users can also login to the server. Login is successful if the id and the password sent to the server matched with one of the accounts listed on the server application. This system can accepts multiple connections at once. A connection is counted when a client application is connected to the server. If there are 2 connections or more then we must wait for the first client to exit the application to be able to login and use the application. Keverk wanted the file that stores the id and password named account.txt with the following format :
+**akun.txt**
+```
+id:password
+id2:password2
+```
+Answer :
+```
+//client
+int main(int argc, char const *argv[])
+{
+    pthread_t tid[2];
+    int fdc = create_socket();
+    //bisa menghandle client banyak
+    //minta masukka username
+    pthread_create(&(tid[0]), NULL, &cekoutput, (void *) &fdc);
+    //minta masukkan email
+    pthread_create(&(tid[1]), NULL, &cekinput, (void *) &fdc);
+    //joinkan
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+    close(fdc);
+    return 0;
+}
+```
+
+```
+//register
+void daftar(char *messages, int fd)
+{
+    char id[300], password[300];
+    FILE *fp = fopen("akun.txt", "a+");
+
+    if (validasi(fd, id, password) != 0) {
+        if (sudahregister(fp, id)) {
+            send(fd, "Username already exist.\n", SIZE_BUFFER, 0);
+        } else {
+            fprintf(fp, "%s:%s\n", id, password);
+            send(fd, "Account registration successful.\n", SIZE_BUFFER, 0);
+        }
+    }
+    fclose(fp);
+}
+
+//login
+void login(char *messages, int fd)
+{
+    if (socketawal != -1) {
+        send(fd, "Server is busy. Please wait ...\n", SIZE_BUFFER, 0);
+        return;
+    }
+    //buka akun
+    char id[300], password[300];
+    FILE *fp = fopen("akun.txt", "a+");
+    //cek apakah berhasil
+    if (validasi(fd, id, password) != 0) {
+        if (loginberhasil(fp, id, password)) {
+            send(fd, "Login successful.\n", SIZE_BUFFER, 0);
+            socketawal = fd;
+            strcpy(validator[0], id);
+            strcpy(validator[1], password);
+        } else {
+            send(fd, "Incorrect username / password\n", SIZE_BUFFER, 0);
+        }
+    }
+    fclose(fp);
+}
+```
+Result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1a.png)
+
+### 1b
+The system has a database on a file named files.tsv. The content of the file is the file path on the server, publisher, and the year of publication. For every insertion and removal of a file in the folder FILES on the server, the file files.tsv will be affected. Folder FILES are made, automatically when the server is started
+
+Answer :
+```
+void add(char *messages, int fd)
+{
+    char *dirName = "FILES";
+    char publisher[300], year[300], client_path[300];
+    sleep(0.001);
+    if (ambilinput(fd, "Publisher: ", publisher) == 0) return;
+    if (ambilinput(fd, "Publication Year: ", year) == 0) return;
+    if (ambilinput(fd, "Filepath: ", client_path) == 0) return;
+
+    FILE *fp = fopen("files.tsv", "a+");
+    char *fileName = ceknamafile(client_path);
+
+    if (sudahdownload(fp, fileName)) {
+        send(fd, "File uploaded already exist.\n", SIZE_BUFFER, 0);
+    } else {
+        send(fd, "Sending file ...\n", SIZE_BUFFER, 0);
+        mkdir(dirName, 0777);
+        if (masukkanfile(fd, dirName, fileName) == 0) {
+            fprintf(fp, "%s\t%s\t%s\n", client_path, publisher, year);
+            printf("File sent.\n");
+            runninglog("add", fileName);
+        } else {
+            printf("Error occured when receiving file\n");
+        }
+    }
+    fclose(fp);
+}
+```
+Result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1b.png)
+
+### 1c
+Not only that, Keverk is asked to make a feature such that clients are able to insert new files to the server. FILES directory have a structure as follows : 
+Direktori **FILES**
+```
+File1.extension
+File2.extension
+```
+First, the client send input to the server with the structure as follows:
+Client command example :
+```
+add
+```
+Client console output :
+```
+Publisher :
+Publication Year :
+Filepath :
+```
+Then, we can fill the book’s data (please note that Filepath is the path to the file that will be sent to the server). Then the client will send the file to the server via socket. When a file is received at the server, a new row containing new data of the book is then added to the files.tsv.
+
+Answer :
+```
+void add(char *messages, int fd)
+{
+    char *dirName = "FILES";
+    char publisher[300], year[300], client_path[300];
+    sleep(0.001);
+    if (ambilinput(fd, "Publisher: ", publisher) == 0) return;
+    if (ambilinput(fd, "Publication Year: ", year) == 0) return;
+    if (ambilinput(fd, "Filepath: ", client_path) == 0) return;
+
+    FILE *fp = fopen("files.tsv", "a+");
+    char *fileName = ceknamafile(client_path);
+
+    if (sudahdownload(fp, fileName)) {
+        send(fd, "File uploaded already exist.\n", SIZE_BUFFER, 0);
+    } else {
+        send(fd, "Sending file ...\n", SIZE_BUFFER, 0);
+        mkdir(dirName, 0777);
+        if (masukkanfile(fd, dirName, fileName) == 0) {
+            fprintf(fp, "%s\t%s\t%s\n", client_path, publisher, year);
+            printf("File sent.\n");
+            runninglog("add", fileName);
+        } else {
+            printf("Error occured when receiving file\n");
+        }
+    }
+    fclose(fp);
+}
+```
+result :
+![alt text}(https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1c.png)
+
+### 1d
+Clients can also download files that exist in the FILES folder in the server, then the system must send the following file to the client. Server must check from files.tsv to check if the file requested is valid. If it’s not valid, the system sends an error message back to the client. If valid, the following file is then sent to the client in the client folder.
+
+Client command example :
+```
+delete TEMPfile.pdf
+```
+
+Answer :
+```
+void download(char *filename, int fd)
+{
+    FILE *fp = fopen("files.tsv", "a+");
+    if (sudahdownload(fp, filename)) {
+        kirim(fd, filename);
+    } else {
+        send(fd, "File does not exist.\n", SIZE_BUFFER, 0);
+    }
+    fclose(fp);
+}
+```
+result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1d.png)
+
+### 1e
+After that, the client can also delete file that is stored on the server. But keverk is afraid that the file that is going to be deleted is an important file, so instead of deleting the file, the program just changes its name to ‘old-FileName.extension’. When the filename is changed, the row of the file in files.tsv will be deleted.
+
+Client command example :
+```
+delete TEMPfile.pdf
+```
+
+Answer : 
+```
+void hapus(char *filename, int fd)
+{
+    //buka file
+    FILE *fp = fopen("files.tsv", "a+");
+    char db[300], currFilePath[300], publisher[300], year[300];
+    if (sudahdownload(fp, filename)) {
+        rewind(fp);
+        FILE *tmp_fp = fopen("temp.tsv", "a+");
+        //buat sebuah temp supaya pada saat pertukaran data tidak berubah2
+        while (fgets(db, SIZE_BUFFER, fp)) {
+            sscanf(db, "%s\t%s\t%s", currFilePath, publisher, year);
+            if (strcmp(ceknamafile(currFilePath), filename) != 0) { 
+                fprintf(tmp_fp, "%s", db);
+            }
+            memset(db, 0, SIZE_BUFFER);
+        }
+        fclose(tmp_fp);
+        fclose(fp);
+        remove("files.tsv");
+        rename("temp.tsv", "files.tsv");
+        char deletedFileName[300];
+        sprintf(deletedFileName, "FILES/%s", filename);
+        char newFileName[300];
+        sprintf(newFileName, "FILES/old-%s", filename);
+        rename(deletedFileName, newFileName);
+        send(fd, "File successfully deleted.\n", SIZE_BUFFER, 0);
+        runninglog("delete", filename);
+    } 
+    else {
+        send(fd, "File download failed.\n", SIZE_BUFFER, 0);
+        fclose(fp);
+    }
+}
+```
+result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1e.png)
+
+### 1f
+Clients can see all the contents of files.tsv by calling the see command. Output of the command will follow this format. 
+Client command example :
+```
+see
+```
+Client console output :
+```
+Name :
+Publisher:
+Publication year:
+File extension : 
+Filepath : 
+
+Name:
+Publisher:
+Publication Year:
+File extension: 
+Filepath : 
+```
+
+Answer :
+```
+void see(char *buf, int fd, bool isFind)
+{
+    int counter = 0;
+    FILE *src = fopen("files.tsv", "r");
+    if (!src) {
+        write(fd, "Files.tsv not found\n", SIZE_BUFFER);
+        return;
+    }
+
+    char temp[300 + 85], namafile[300/3], ext[5],
+        filepath[300/3], publisher[300/3], year[10];
+        
+    while (fscanf(src, "%s\t%s\t%s", filepath, publisher, year) != EOF) {
+        pemisahfile(filepath, namafile, ext);
+        if (isFind && strstr(namafile, buf) == NULL) continue;
+        counter++;
+
+        sprintf(temp, 
+            "Name: %s\nPublisher: %s\nPublication Year: %s\nFile Extension: %s\nFilepath: %s\n\n",
+            namafile, publisher, year, ext, filepath
+        );
+        write(fd, temp, SIZE_BUFFER);
+        sleep(0.001);
+    }
+    if(counter == 0) {
+        if (isFind) write(fd, "Command not existed in files.tsv\n", SIZE_BUFFER);
+        else write(fd, "Data not existed in files.tsv database\n", SIZE_BUFFER);
+    } 
+    fclose(src);
+}
+```
+result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1f.png)
+
+### 1g
+The client application can also do search by using the find command and a string. It will output the same format as number 6.
+Client command example :
+```
+find TEMP
+```
+
+Answer :
+```
+void see(char *buf, int fd, bool isFind)
+{
+    int counter = 0;
+    FILE *src = fopen("files.tsv", "r");
+    if (!src) {
+        write(fd, "Files.tsv not found\n", SIZE_BUFFER);
+        return;
+    }
+
+    char temp[300 + 85], namafile[300/3], ext[5],
+        filepath[300/3], publisher[300/3], year[10];
+        
+    while (fscanf(src, "%s\t%s\t%s", filepath, publisher, year) != EOF) {
+        pemisahfile(filepath, namafile, ext);
+        if (isFind && strstr(namafile, buf) == NULL) continue;
+        counter++;
+
+        sprintf(temp, 
+            "Name: %s\nPublisher: %s\nPublication Year: %s\nFile Extension: %s\nFilepath: %s\n\n",
+            namafile, publisher, year, ext, filepath
+        );
+        write(fd, temp, SIZE_BUFFER);
+        sleep(0.001);
+    }
+    if(counter == 0) {
+        if (isFind) write(fd, "Command not existed in files.tsv\n", SIZE_BUFFER);
+        else write(fd, "Data not existed in files.tsv database\n", SIZE_BUFFER);
+    } 
+    fclose(src);
+}
+```
+result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1g.png)
+
+### 1h
+Keverk is cautious on insertion and removal of files on the server, so he made a log file for the server named running.log. The content of the log file is following this format
+**running.log**
+```
+Tambah : File1.extension (id:pass)
+Hapus : File2.extension (id:pass)
+```
+
+Answer :
+```
+void runninglog(char *cmd, char *filename)
+{
+    FILE *fp = fopen("running.log", "a+");
+    cmd = (strcmp(cmd, "add") == 0) ? "Tambah" : "Hapus";
+    fprintf(fp, "%s : %s (%s:%s)\n", cmd, filename, validator[0], validator[1]);
+    fclose(fp);
+}
+```
+result :
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1h.png)
 
 ## Problem 2
 
@@ -91,8 +446,6 @@ printf("Multiplication Matrix:\n");
 }
 ```
 Below is the result of 2a
-
-![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2a.png)
 
 ### 2b
 Create a program using the output matrix of the previous program (program soal2a.c) (Note!: Use shared memory). Then the matrix will be calculated with the new matrix. As follows an example of calculation for the existing matrix. The calculation is that each cell originating from matrix A becomes a number for factorial, then cells from matrix B become the maximum factorial limit (from largest to smallest) (Note!: Use threads for calculations in each cell).
@@ -232,8 +585,6 @@ Create and join the thread. At last, print the result of problem 2b.
 ```
 Below is the result of 2b
 
-![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2b.png)
-
 ### 2c
 For fear of lags in the process of helping Loba, Crypto also created a program (soal2c.c) to check the top 5 processes consuming computer resources with the command  “ps aux | sort -nrk 3,3 | head -5” (Note !: You must use IPC Pipes).
 
@@ -322,12 +673,6 @@ Next, in the child process, use the pipe to connect the 3 command (ps aux | sort
 ```
 
 Below is the result of 2c
-
-![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal2/result2c.png)
-
-### Error When Solving Problem 2
-1. In problem 2b, the constraint of the result can't use "int" in some testcase. Thus, we use "unsigned long long".
-2. In problem 2c, there is a minor error in the pipe before, but now we already fix it.
 
 ## Problem 3
 During his time of inactivity, a student named Alex. He had an idea to tidy up a number of files on his laptop. Because there are too many files, Alex asked Ayub for advice.
