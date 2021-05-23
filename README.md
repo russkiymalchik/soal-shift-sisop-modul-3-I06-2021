@@ -336,5 +336,18 @@ else{
 
 ![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal3ss/lab%203a.jpg)
 
+### Question 3 Screenshot
+
+Before 3b testcase was run
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal3ss/before%203b.jpg)
+
+after 3b testcase was run
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal3ss/after%203b.jpg)
+
+before 3c testcase was run
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal3ss/before%203c.jpg)
+
+after 3c testcase was run
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal3ss/after%203c.jpg)
 
  
