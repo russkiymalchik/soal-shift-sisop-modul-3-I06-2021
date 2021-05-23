@@ -76,7 +76,7 @@ void login(char *messages, int fd)
     fclose(fp);
 }
 ```
-Result :
+result :
 ![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1a.png)
 
 ### 1b
@@ -112,7 +112,8 @@ void add(char *messages, int fd)
     fclose(fp);
 }
 ```
-Result :
+result :
+
 ![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1b.png)
 
 ### 1c
@@ -166,7 +167,7 @@ void add(char *messages, int fd)
 }
 ```
 result :
-![alt text}(https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1c.png)
+![alt text](https://github.com/russkiymalchik/soal-shift-sisop-modul-3-I06-2021/blob/main/screenshots/soal1/result1c.png)
 
 ### 1d
 Clients can also download files that exist in the FILES folder in the server, then the system must send the following file to the client. Server must check from files.tsv to check if the file requested is valid. If it’s not valid, the system sends an error message back to the client. If valid, the following file is then sent to the client in the client folder.
